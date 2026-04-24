@@ -1,0 +1,1 @@
+{"version":3,"file":"dependencies.d.ts","sourceRoot":"","sources":["../../src/analyzer/dependencies.ts"],"names":[],"mappings":"AAEA,OAAO,EACL,kBAAkB,EAInB,MAAM,UAAU,CAAC;AAElB,wBAAgB,mBAAmB,CAAC,WAAW,EAAE,MAAM,GAAG;IACxD,QAAQ,EAAE,kBAAkB,CAAC;IAC7B,OAAO,EAAE,MAAM,CAAC,MAAM,EAAE,MAAM,CAAC,CAAC;CACjC,CAwBA;AA4ED,wBAAgB,cAAc,CAAC,WAAW,EAAE,MAAM,GAAG,MAAM,CAW1D"}

@@ -1,0 +1,36 @@
+{
+  "name": "project-onboarder",
+  "version": "1.0.0",
+  "description": "CLI tool that analyzes a project and generates an onboarding guide for new developers",
+  "main": "dist/index.js",
+  "bin": {
+    "project-onboarder": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "onboarding",
+    "documentation",
+    "cli",
+    "developer-experience",
+    "project-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "glob": "^10.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
