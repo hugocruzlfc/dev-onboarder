@@ -1,11 +1,11 @@
 {
   "name": "dev-onboarder",
-  "version": "1.0.0",
-  "description": "CLI tool that analyzes a project and generates an onboarding guide for new developers",
+  "version": "0.1.0",
+  "description": "CLI tool that analyzes any Node.js/TypeScript project and generates an onboarding guide for new developers",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
   "bin": {
-    "project-onboarder": "dist/index.js"
+    "dev-onboarder": "dist/index.js"
   },
   "exports": {
     ".": {
@@ -14,24 +14,40 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "keywords": [
     "onboarding",
     "documentation",
     "cli",
     "developer-experience",
-    "project-analysis"
+    "project-analysis",
+    "code-analysis",
+    "mermaid",
+    "architecture",
+    "readme-generator",
+    "developer-tools"
   ],
-  "author": "",
+  "author": "Hugo Cruz <hugocruzlfc@gmail.com> (https://github.com/hugocruzlfc)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hugocruzlfc/dev-onboarder.git"
+  },
+  "homepage": "https://github.com/hugocruzlfc/dev-onboarder",
+  "bugs": {
+    "url": "https://github.com/hugocruzlfc/dev-onboarder/issues"
+  },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "typescript": "^5.3.0",

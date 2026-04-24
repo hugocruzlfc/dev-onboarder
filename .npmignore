@@ -1,0 +1,9 @@
+src/
+tests/
+vitest.config.ts
+tsconfig.json
+.git/
+.github/
+*.test.ts
+TEST_ONBOARDING.md
+ONBOARDING.md

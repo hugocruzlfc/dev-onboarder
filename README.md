@@ -6,12 +6,17 @@ CLI tool que analiza cualquier proyecto Node.js/TypeScript y genera automáticam
 
 Escanea tu proyecto y genera un documento `ONBOARDING.md` que incluye:
 
-- **Resumen del proyecto** — Framework, tipo, dependencias totales
+- **Resumen del proyecto** — Framework, tipo, dependencias totales, métricas
 - **Quick Start** — Pasos para levantar el proyecto desde cero
+- **Dónde empezar** — Entry points, archivos hub, tips de navegación
+- **Métricas** — Archivos, líneas de código, % TypeScript, archivos más grandes
 - **Diagramas de arquitectura** — Mermaid diagrams del flujo de datos
 - **Estructura de carpetas** — Árbol visual con descripción de directorios
+- **Mapa de endpoints** — Rutas API detectadas (Express, NestJS, Next.js)
+- **Variables de entorno** — Parseadas de `.env.example` y código fuente
 - **Stack tecnológico** — Todas las librerías categorizadas y documentadas
 - **Patrones de diseño** — Detecta MVC, Feature-based, DI, Hooks, etc.
+- **Grafo de dependencias internas** — Relaciones de imports entre archivos
 - **Estilos** — Tailwind, CSS Modules, styled-components, etc.
 - **Estado global** — Redux, Zustand, Jotai, etc.
 - **Data fetching** — React Query, SWR, tRPC, Apollo, etc.
@@ -126,6 +131,25 @@ node dist/index.js /ruta/al/proyecto
 - **Commander** — CLI parsing
 - **Chalk** — Output con colores
 - **Ora** — Spinners de progreso
+- **Vitest** — Testing
+
+## Uso como librería
+
+También puedes usar `dev-onboarder` programáticamente:
+
+```typescript
+import { analyzeProject, generateMarkdown } from "dev-onboarder";
+
+const analysis = analyzeProject("/ruta/al/proyecto");
+const markdown = generateMarkdown(analysis);
+
+// O trabaja directamente con el análisis
+console.log(analysis.framework); // { name: 'Next.js', version: '14.0.0', ... }
+console.log(analysis.endpoints); // [{ method: 'GET', path: '/api/users', ... }]
+console.log(analysis.envVars); // [{ name: 'DATABASE_URL', required: true, ... }]
+console.log(analysis.metrics); // { totalFiles: 120, totalLines: 8500, ... }
+console.log(analysis.importGraph); // [{ file: 'src/index.ts', imports: [...], importedBy: [...] }]
+```
 
 ## Licencia
 

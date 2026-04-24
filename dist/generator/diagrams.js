@@ -192,7 +192,9 @@ function generateImportGraphDiagram(analysis) {
     // Find the most connected files to keep the diagram readable
     const nodes = analysis.importGraph
         .filter((n) => n.imports.length > 0 || n.importedBy.length > 0)
-        .sort((a, b) => (b.imports.length + b.importedBy.length) - (a.imports.length + a.importedBy.length))
+        .sort((a, b) => b.imports.length +
+        b.importedBy.length -
+        (a.imports.length + a.importedBy.length))
         .slice(0, 15);
     if (nodes.length === 0)
         return "";
@@ -228,8 +230,6 @@ function sanitizeId(filePath) {
 }
 function shortenPath(filePath) {
     // Remove src/ prefix and extension for cleaner labels
-    return filePath
-        .replace(/^src\//, "")
-        .replace(/\.(ts|tsx|js|jsx)$/, "");
+    return filePath.replace(/^src\//, "").replace(/\.(ts|tsx|js|jsx)$/, "");
 }
 //# sourceMappingURL=diagrams.js.map

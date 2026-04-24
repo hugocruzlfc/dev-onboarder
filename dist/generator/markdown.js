@@ -136,8 +136,7 @@ function generateMarkdown(analysis) {
     md += `| **Total archivos** | ${analysis.metrics.totalFiles} |\n`;
     md += `| **Total líneas** | ${analysis.metrics.totalLines.toLocaleString("es")} |\n`;
     md += `| **TypeScript** | ${analysis.metrics.tsPercentage}% |\n`;
-    const extEntries = Object.entries(analysis.metrics.byExtension)
-        .sort((a, b) => b[1].lines - a[1].lines);
+    const extEntries = Object.entries(analysis.metrics.byExtension).sort((a, b) => b[1].lines - a[1].lines);
     if (extEntries.length > 0) {
         md += `\n### Desglose por lenguaje\n\n`;
         md += `| Extensión | Archivos | Líneas |\n`;
