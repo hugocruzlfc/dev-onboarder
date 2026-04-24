@@ -1,6 +1,6 @@
 {
   "name": "dev-onboarder",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CLI tool that analyzes any Node.js/TypeScript project and generates an onboarding guide for new developers",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
