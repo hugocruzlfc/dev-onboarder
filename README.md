@@ -1,92 +1,92 @@
 # 🚀 Dev-Onboarder
 
-CLI tool que analiza cualquier proyecto Node.js/TypeScript y genera automáticamente una **guía de onboarding** completa para nuevos desarrolladores.
+CLI tool that analyzes any Node.js/TypeScript project and automatically generates a complete **onboarding guide** for new developers.
 
-## ¿Qué hace?
+## What does it do?
 
-Escanea tu proyecto y genera un documento `ONBOARDING.md` que incluye:
+Scans your project and generates an `ONBOARDING.md` document that includes:
 
-- **Resumen del proyecto** — Framework, tipo, dependencias totales, métricas
-- **Quick Start** — Pasos para levantar el proyecto desde cero
-- **Dónde empezar** — Entry points, archivos hub, tips de navegación
-- **Métricas** — Archivos, líneas de código, % TypeScript, archivos más grandes
-- **Diagramas de arquitectura** — Mermaid diagrams del flujo de datos
-- **Estructura de carpetas** — Árbol visual con descripción de directorios
-- **Mapa de endpoints** — Rutas API detectadas (Express, NestJS, Next.js)
-- **Variables de entorno** — Parseadas de `.env.example` y código fuente
-- **Stack tecnológico** — Todas las librerías categorizadas y documentadas
-- **Patrones de diseño** — Detecta MVC, Feature-based, DI, Hooks, etc.
-- **Grafo de dependencias internas** — Relaciones de imports entre archivos
-- **Estilos** — Tailwind, CSS Modules, styled-components, etc.
-- **Estado global** — Redux, Zustand, Jotai, etc.
+- **Project summary** — Framework, type, total dependencies, metrics
+- **Quick Start** — Steps to get the project running from scratch
+- **Where to start** — Entry points, hub files, navigation tips
+- **Metrics** — Files, lines of code, TypeScript %, largest files
+- **Architecture diagrams** — Mermaid diagrams of the data flow
+- **Folder structure** — Visual tree with directory descriptions
+- **Endpoints map** — Detected API routes (Express, NestJS, Next.js)
+- **Environment variables** — Parsed from `.env.example` and source code
+- **Tech stack** — All libraries categorized and documented
+- **Design patterns** — Detects MVC, Feature-based, DI, Hooks, etc.
+- **Internal dependency graph** — Import relationships between files
+- **Styling** — Tailwind, CSS Modules, styled-components, etc.
+- **Global state** — Redux, Zustand, Jotai, etc.
 - **Data fetching** — React Query, SWR, tRPC, Apollo, etc.
-- **Base de datos** — Prisma, Drizzle, TypeORM, Mongoose, etc.
-- **Autenticación** — NextAuth, Clerk, Passport, etc.
+- **Database** — Prisma, Drizzle, TypeORM, Mongoose, etc.
+- **Authentication** — NextAuth, Clerk, Passport, etc.
 - **Testing** — Jest, Vitest, Cypress, Playwright, etc.
-- **Scripts disponibles** — Todos los npm scripts documentados
-- **Configuraciones** — Archivos de config detectados y su propósito
+- **Available scripts** — All npm scripts documented
+- **Config files** — Detected configuration files and their purpose
 
-## Instalación
+## Installation
 
 ```bash
-# Opción 1: Ejecutar directamente con npx (recomendado)
+# Option 1: Run directly with npx (recommended)
 npx dev-onboarder
 
-# Opción 2: Instalar globalmente
+# Option 2: Install globally
 npm install -g dev-onboarder
 
-# Opción 3: Clonar el repo
-git clone <url>
+# Option 3: Clone the repo
+git clone https://github.com/hugocruzlfc/dev-onboarder.git
 cd dev-onboarder
 npm install
 npm run build
 ```
 
-## Uso
+## Usage
 
 ```bash
-# Analizar el directorio actual
+# Analyze the current directory
 npx dev-onboarder
 
-# Analizar un proyecto específico
-npx dev-onboarder /ruta/al/proyecto
+# Analyze a specific project
+npx dev-onboarder /path/to/project
 
-# Cambiar nombre del archivo de salida
-npx dev-onboarder --output GUIA.md
+# Change output file name
+npx dev-onboarder --output GUIDE.md
 
-# Imprimir en consola en lugar de archivo
+# Print to console instead of file
 npx dev-onboarder --stdout
 
-# Exportar análisis como JSON
+# Export analysis as JSON
 npx dev-onboarder --json
 ```
 
-## Ejemplo de salida
+## Example output
 
-Al ejecutar en un proyecto Next.js con Prisma y Tailwind, genera algo como:
+When running on a Next.js project with Prisma and Tailwind, it generates something like:
 
 ```
 🔍 dev-onboarder
 
-   Analizando: /Users/dev/mi-proyecto
+   Analyzing: /Users/dev/my-project
 
-✅ Guía generada exitosamente!
-   📄 Archivo: /Users/dev/mi-proyecto/ONBOARDING.md
+✅ Guide generated successfully!
+   📄 File: /Users/dev/my-project/ONBOARDING.md
 
-   Resumen:
+   Summary:
    ├── Framework: Next.js ^14.0.0
-   ├── Dependencias: 45
-   ├── Patrones: File-Based Routing, Service Layer, Custom Hooks
-   ├── Estilos: Tailwind CSS
+   ├── Dependencies: 45
+   ├── Patterns: File-Based Routing, Service Layer, Custom Hooks
+   ├── Styling: Tailwind CSS
    ├── Testing: Vitest
-   ├── Estado: Zustand
+   ├── State: Zustand
    ├── DB: @prisma/client
-   └── Configs: 8 archivos detectados
+   └── Configs: 8 files detected
 ```
 
-## Frameworks soportados
+## Supported frameworks
 
-| Framework        | Categoría          |
+| Framework        | Category           |
 | ---------------- | ------------------ |
 | Next.js          | Fullstack          |
 | Remix            | Fullstack          |
@@ -101,49 +101,53 @@ Al ejecutar en un proyecto Next.js con Prisma y Tailwind, genera algo como:
 | Astro            | Fullstack          |
 | Hono             | Backend            |
 
-## Diagramas
+## Diagrams
 
-El documento generado incluye diagramas Mermaid renderizables en GitHub, GitLab, VS Code (con extensión) y la mayoría de viewers de Markdown:
+The generated document includes Mermaid diagrams renderable on GitHub, GitLab, VS Code (with extension) and most Markdown viewers:
 
-- **Diagrama de Arquitectura** — Vista general de las capas del proyecto
-- **Diagrama de Estructura** — Visualización de carpetas principales
-- **Diagrama de Flujo de Datos** — Secuencia típica de una interacción usuario-servidor
+- **Architecture Diagram** — Overview of the project's layers
+- **Structure Diagram** — Main folder visualization
+- **Data Flow Diagram** — Typical user-server interaction sequence
+- **Internal Dependency Graph** — Import relationships between source files
 
-## Desarrollo
+## Development
 
 ```bash
-# Instalar deps
+# Install deps
 npm install
 
 # Build
 npm run build
 
-# Ejecutar en modo desarrollo
-npm run dev -- /ruta/al/proyecto
+# Run in development mode
+npm run dev -- /path/to/project
 
-# Probar con tu propio proyecto
-node dist/index.js /ruta/al/proyecto
+# Test with your own project
+node dist/index.js /path/to/project
+
+# Run tests
+npm test
 ```
 
-## Tecnologías
+## Tech stack
 
-- **TypeScript** — Type-safety completo
+- **TypeScript** — Full type-safety
 - **Commander** — CLI parsing
-- **Chalk** — Output con colores
-- **Ora** — Spinners de progreso
+- **Chalk** — Colored output
+- **Ora** — Progress spinners
 - **Vitest** — Testing
 
-## Uso como librería
+## Programmatic usage
 
-También puedes usar `dev-onboarder` programáticamente:
+You can also use `dev-onboarder` as a library:
 
 ```typescript
 import { analyzeProject, generateMarkdown } from "dev-onboarder";
 
-const analysis = analyzeProject("/ruta/al/proyecto");
+const analysis = analyzeProject("/path/to/project");
 const markdown = generateMarkdown(analysis);
 
-// O trabaja directamente con el análisis
+// Or work directly with the analysis object
 console.log(analysis.framework); // { name: 'Next.js', version: '14.0.0', ... }
 console.log(analysis.endpoints); // [{ method: 'GET', path: '/api/users', ... }]
 console.log(analysis.envVars); // [{ name: 'DATABASE_URL', required: true, ... }]
@@ -151,6 +155,10 @@ console.log(analysis.metrics); // { totalFiles: 120, totalLines: 8500, ... }
 console.log(analysis.importGraph); // [{ file: 'src/index.ts', imports: [...], importedBy: [...] }]
 ```
 
-## Licencia
+## License
 
 MIT
+
+---
+
+📖 [Leer en español](README.es.md)
