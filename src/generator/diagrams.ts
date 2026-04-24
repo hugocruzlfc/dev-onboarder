@@ -234,3 +234,59 @@ function getDirIcon(name: string): string {
   };
   return icons[name.toLowerCase()] || "📁";
 }
+
+export function generateImportGraphDiagram(analysis: ProjectAnalysis): string {
+  // Find the most connected files to keep the diagram readable
+  const nodes = analysis.importGraph
+    .filter((n) => n.imports.length > 0 || n.importedBy.length > 0)
+    .sort(
+      (a, b) =>
+        b.imports.length +
+        b.importedBy.length -
+        (a.imports.length + a.importedBy.length),
+    )
+    .slice(0, 15);
+
+  if (nodes.length === 0) return "";
+
+  const nodeFiles = new Set(nodes.map((n) => n.file));
+
+  let diagram = "```mermaid\nflowchart LR\n";
+
+  // Add nodes
+  for (const node of nodes) {
+    const id = sanitizeId(node.file);
+    const label = shortenPath(node.file);
+    diagram += `  ${id}["${label}"]\n`;
+  }
+
+  diagram += "\n";
+
+  // Add edges (only between visible nodes)
+  const edges = new Set<string>();
+  for (const node of nodes) {
+    const fromId = sanitizeId(node.file);
+    for (const imp of node.imports) {
+      if (nodeFiles.has(imp)) {
+        const toId = sanitizeId(imp);
+        const edgeKey = `${fromId}->${toId}`;
+        if (!edges.has(edgeKey)) {
+          edges.add(edgeKey);
+          diagram += `  ${fromId} --> ${toId}\n`;
+        }
+      }
+    }
+  }
+
+  diagram += "```";
+  return diagram;
+}
+
+function sanitizeId(filePath: string): string {
+  return filePath.replace(/[^a-zA-Z0-9]/g, "_").replace(/_+/g, "_");
+}
+
+function shortenPath(filePath: string): string {
+  // Remove src/ prefix and extension for cleaner labels
+  return filePath.replace(/^src\//, "").replace(/\.(ts|tsx|js|jsx)$/, "");
+}

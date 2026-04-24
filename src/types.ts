@@ -15,6 +15,47 @@ export interface ProjectAnalysis {
   testing: TestingInfo;
   database: LibraryInfo[];
   authentication: LibraryInfo[];
+  endpoints: EndpointInfo[];
+  envVars: EnvVarInfo[];
+  importGraph: ImportGraphNode[];
+  metrics: ProjectMetrics;
+  entryPoints: EntryPointInfo[];
+}
+
+export interface EndpointInfo {
+  method: string;
+  path: string;
+  file: string;
+  line: number;
+  handler?: string;
+}
+
+export interface EnvVarInfo {
+  name: string;
+  defaultValue?: string;
+  description?: string;
+  required: boolean;
+  source: string; // file where found
+}
+
+export interface ImportGraphNode {
+  file: string;
+  imports: string[];
+  importedBy: string[];
+}
+
+export interface ProjectMetrics {
+  totalFiles: number;
+  totalLines: number;
+  byExtension: Record<string, { files: number; lines: number }>;
+  largestFiles: { file: string; lines: number }[];
+  tsPercentage: number;
+}
+
+export interface EntryPointInfo {
+  file: string;
+  type: "main" | "server" | "page" | "api-route" | "config";
+  description: string;
 }
 
 export interface FrameworkInfo {

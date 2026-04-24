@@ -40,6 +40,10 @@ const dependencies_1 = require("./dependencies");
 const framework_1 = require("./framework");
 const patterns_1 = require("./patterns");
 const config_1 = require("./config");
+const endpoints_1 = require("./endpoints");
+const imports_1 = require("./imports");
+const envvars_1 = require("./envvars");
+const metrics_1 = require("./metrics");
 function analyzeProject(projectPath) {
     const resolvedPath = path.resolve(projectPath);
     const projectName = (0, dependencies_1.getProjectName)(resolvedPath);
@@ -60,6 +64,12 @@ function analyzeProject(projectPath) {
     const testing = (0, framework_1.detectTesting)(dependencies);
     const database = (0, framework_1.detectDatabase)(dependencies);
     const authentication = (0, framework_1.detectAuthentication)(dependencies);
+    // 7. Source code analysis
+    const endpoints = (0, endpoints_1.detectEndpoints)(resolvedPath, dependencies);
+    const importGraph = (0, imports_1.buildImportGraph)(resolvedPath);
+    const envVars = (0, envvars_1.detectEnvVars)(resolvedPath);
+    const metrics = (0, metrics_1.analyzeMetrics)(resolvedPath);
+    const entryPoints = (0, imports_1.detectEntryPoints)(resolvedPath, importGraph, scripts);
     return {
         projectName,
         projectPath: resolvedPath,
@@ -75,6 +85,11 @@ function analyzeProject(projectPath) {
         testing,
         database,
         authentication,
+        endpoints,
+        envVars,
+        importGraph,
+        metrics,
+        entryPoints,
     };
 }
 //# sourceMappingURL=index.js.map

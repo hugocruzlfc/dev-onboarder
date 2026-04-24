@@ -107,6 +107,14 @@ program
         console.log(chalk_1.default.white(`   ├── Patrones: ${analysis.patterns.map((p) => p.name).join(", ")}`));
         console.log(chalk_1.default.white(`   ├── Estilos: ${analysis.styling.approach}`));
         console.log(chalk_1.default.white(`   ├── Testing: ${analysis.testing.framework}`));
+        console.log(chalk_1.default.white(`   ├── Archivos: ${analysis.metrics.totalFiles} (${analysis.metrics.totalLines} líneas)`));
+        console.log(chalk_1.default.white(`   ├── TypeScript: ${analysis.metrics.tsPercentage}%`));
+        if (analysis.endpoints.length > 0) {
+            console.log(chalk_1.default.white(`   ├── Endpoints: ${analysis.endpoints.length} detectados`));
+        }
+        if (analysis.envVars.length > 0) {
+            console.log(chalk_1.default.white(`   ├── Env vars: ${analysis.envVars.length} variables`));
+        }
         if (analysis.stateManagement.length > 0) {
             console.log(chalk_1.default.white(`   ├── Estado: ${analysis.stateManagement.map((s) => s.name).join(", ")}`));
         }

@@ -5,6 +5,7 @@ import {
   generateArchitectureDiagram,
   generateDataFlowDiagram,
   generateFolderDiagram,
+  generateImportGraphDiagram,
 } from "./diagrams";
 
 export function generateMarkdown(analysis: ProjectAnalysis): string {
@@ -24,10 +25,18 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
   md += `## 📑 Tabla de Contenidos\n\n`;
   md += `- [Resumen del Proyecto](#-resumen-del-proyecto)\n`;
   md += `- [Quick Start](#-quick-start)\n`;
+  md += `- [Dónde Empezar](#-dónde-empezar)\n`;
+  md += `- [Métricas del Proyecto](#-métricas-del-proyecto)\n`;
   md += `- [Arquitectura y Diagrama](#-arquitectura-y-diagrama)\n`;
   md += `- [Estructura del Proyecto](#-estructura-del-proyecto)\n`;
   md += `- [Stack Tecnológico](#-stack-tecnológico)\n`;
   md += `- [Patrones de Diseño](#-patrones-de-diseño)\n`;
+  if (analysis.endpoints.length > 0) {
+    md += `- [Mapa de Endpoints / Rutas](#-mapa-de-endpoints--rutas)\n`;
+  }
+  if (analysis.envVars.length > 0) {
+    md += `- [Variables de Entorno](#-variables-de-entorno)\n`;
+  }
   md += `- [Estilos](#-estilos)\n`;
   md += `- [Estado Global](#-estado-global)\n`;
   md += `- [Data Fetching](#-data-fetching)\n`;
@@ -37,6 +46,7 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
   md += `- [Scripts Disponibles](#-scripts-disponibles)\n`;
   md += `- [Archivos de Configuración](#-archivos-de-configuración)\n`;
   md += `- [Flujo de Datos](#-flujo-de-datos)\n`;
+  md += `- [Grafo de Dependencias Internas](#-grafo-de-dependencias-internas)\n`;
   md += `- [Dependencias Principales](#-dependencias-principales)\n`;
   md += `\n---\n\n`;
 
@@ -50,6 +60,8 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
   md += `| **Total Dependencias** | ${analysis.dependencies.total} (${analysis.dependencies.production.length} prod + ${analysis.dependencies.development.length} dev) |\n`;
   md += `| **Estilos** | ${analysis.styling.approach} |\n`;
   md += `| **Testing** | ${analysis.testing.framework} |\n`;
+  md += `| **Archivos** | ${analysis.metrics.totalFiles} (${analysis.metrics.totalLines.toLocaleString("es")} líneas) |\n`;
+  md += `| **TypeScript** | ${analysis.metrics.tsPercentage}% del código |\n`;
 
   if (analysis.stateManagement.length > 0) {
     md += `| **Estado Global** | ${analysis.stateManagement.map((s) => s.name).join(", ")} |\n`;
@@ -97,6 +109,76 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
   md += `${devCmd}\n`;
   md += `\`\`\`\n\n`;
   md += `---\n\n`;
+
+  // ── Where to Start ──
+  md += `## 🧭 Dónde Empezar\n\n`;
+  if (analysis.entryPoints.length > 0) {
+    md += `### Entry Points\n\n`;
+    md += `| Archivo | Tipo | Descripción |\n`;
+    md += `|---------|------|-------------|\n`;
+    for (const ep of analysis.entryPoints) {
+      md += `| \`${ep.file}\` | ${getEntryTypeLabel(ep.type)} | ${ep.description} |\n`;
+    }
+    md += `\n`;
+  }
+
+  // Top imported files (hubs)
+  const hubs = analysis.importGraph
+    .filter((n) => n.importedBy.length >= 2)
+    .sort((a, b) => b.importedBy.length - a.importedBy.length)
+    .slice(0, 5);
+
+  if (hubs.length > 0) {
+    md += `### Archivos más importados (hubs del proyecto)\n\n`;
+    md += `Estos archivos son los "centros" del proyecto. Si los entiendes, entiendes el proyecto:\n\n`;
+    md += `| Archivo | Importado por |\n`;
+    md += `|---------|---------------|\n`;
+    for (const hub of hubs) {
+      md += `| \`${hub.file}\` | ${hub.importedBy.length} archivos |\n`;
+    }
+    md += `\n`;
+  }
+
+  // Quick tips based on patterns
+  md += `### Tips de navegación\n\n`;
+  const keyDirsQuick = getKeyDirectories(analysis.structure);
+  if (keyDirsQuick.length > 0) {
+    for (const dir of keyDirsQuick.slice(0, 6)) {
+      md += `- **Necesitas ${getActionForDir(dir.name)}?** → Mira \`${dir.name}/\`\n`;
+    }
+  }
+  md += `\n---\n\n`;
+
+  // ── Project Metrics ──
+  md += `## 📊 Métricas del Proyecto\n\n`;
+  md += `| Métrica | Valor |\n`;
+  md += `|---------|-------|\n`;
+  md += `| **Total archivos** | ${analysis.metrics.totalFiles} |\n`;
+  md += `| **Total líneas** | ${analysis.metrics.totalLines.toLocaleString("es")} |\n`;
+  md += `| **TypeScript** | ${analysis.metrics.tsPercentage}% |\n`;
+
+  const extEntries = Object.entries(analysis.metrics.byExtension).sort(
+    (a, b) => b[1].lines - a[1].lines,
+  );
+
+  if (extEntries.length > 0) {
+    md += `\n### Desglose por lenguaje\n\n`;
+    md += `| Extensión | Archivos | Líneas |\n`;
+    md += `|-----------|----------|--------|\n`;
+    for (const [ext, stats] of extEntries) {
+      md += `| \`${ext}\` | ${stats.files} | ${stats.lines.toLocaleString("es")} |\n`;
+    }
+  }
+
+  if (analysis.metrics.largestFiles.length > 0) {
+    md += `\n### Archivos más grandes\n\n`;
+    md += `| Archivo | Líneas |\n`;
+    md += `|---------|--------|\n`;
+    for (const f of analysis.metrics.largestFiles.slice(0, 8)) {
+      md += `| \`${f.file}\` | ${f.lines.toLocaleString("es")} |\n`;
+    }
+  }
+  md += `\n---\n\n`;
 
   // Architecture Diagram
   const archDiagram = generateArchitectureDiagram(analysis);
@@ -159,6 +241,29 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
     }
   }
   md += `---\n\n`;
+
+  // ── Endpoints Map ──
+  if (analysis.endpoints.length > 0) {
+    md += `## 🗺️ Mapa de Endpoints / Rutas\n\n`;
+    md += `| Método | Ruta | Archivo | Línea |\n`;
+    md += `|--------|------|---------|-------|\n`;
+    for (const ep of analysis.endpoints) {
+      md += `| \`${ep.method}\` | \`${ep.path}\` | \`${ep.file}\` | L${ep.line}${ep.handler ? ` (${ep.handler})` : ""} |\n`;
+    }
+    md += `\n---\n\n`;
+  }
+
+  // ── Environment Variables ──
+  if (analysis.envVars.length > 0) {
+    md += `## 🔑 Variables de Entorno\n\n`;
+    md += `El proyecto usa ${analysis.envVars.length} variables de entorno:\n\n`;
+    md += `| Variable | Requerida | Valor por defecto | Fuente | Descripción |\n`;
+    md += `|----------|-----------|-------------------|--------|-------------|\n`;
+    for (const v of analysis.envVars) {
+      md += `| \`${v.name}\` | ${v.required ? "✅ Sí" : "No"} | ${v.defaultValue ? `\`${v.defaultValue}\`` : "-"} | \`${v.source}\` | ${v.description || "-"} |\n`;
+    }
+    md += `\n---\n\n`;
+  }
 
   // Styling
   md += `## 🎨 Estilos\n\n`;
@@ -295,6 +400,15 @@ export function generateMarkdown(analysis: ProjectAnalysis): string {
     md += `## 🔄 Flujo de Datos\n\n`;
     md += `### Secuencia típica de una interacción\n\n`;
     md += dataFlowDiagram + "\n\n";
+    md += `---\n\n`;
+  }
+
+  // Import Graph Diagram
+  const importGraphDiagram = generateImportGraphDiagram(analysis);
+  if (importGraphDiagram) {
+    md += `## 🕸️ Grafo de Dependencias Internas\n\n`;
+    md += `Relaciones de imports entre los archivos principales del proyecto:\n\n`;
+    md += importGraphDiagram + "\n\n";
     md += `---\n\n`;
   }
 
@@ -448,4 +562,45 @@ function getStepNumber(analysis: ProjectAnalysis): number {
   if (analysis.configs.some((c) => c.file.includes(".env"))) step++;
   if (analysis.database.some((d) => d.name.includes("prisma"))) step++;
   return step;
+}
+
+function getEntryTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    main: "📦 Main",
+    server: "⚙️ Server",
+    page: "📄 Page",
+    "api-route": "📡 API Route",
+    config: "🔧 Hub",
+  };
+  return labels[type] || type;
+}
+
+function getActionForDir(dirName: string): string {
+  const actions: Record<string, string> = {
+    src: "ver el código fuente",
+    components: "crear o modificar un componente",
+    hooks: "agregar lógica reutilizable",
+    services: "conectar con una API",
+    utils: "una función de utilidad",
+    lib: "una librería interna",
+    pages: "agregar una nueva página",
+    app: "agregar una nueva ruta",
+    api: "crear un endpoint",
+    styles: "modificar estilos",
+    types: "agregar tipos TypeScript",
+    models: "modificar modelos de datos",
+    controllers: "manejar requests HTTP",
+    middleware: "agregar middleware",
+    store: "manejar estado global",
+    config: "ajustar configuración",
+    test: "escribir tests",
+    tests: "escribir tests",
+    __tests__: "escribir tests",
+    prisma: "modificar el esquema de DB",
+    features: "trabajar en una funcionalidad",
+    modules: "agregar un módulo",
+  };
+
+  const baseName = dirName.replace(/^src\//, "").toLowerCase();
+  return actions[baseName] || `explorar ${dirName}`;
 }

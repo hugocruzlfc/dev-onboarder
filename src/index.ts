@@ -117,6 +117,29 @@ program
         console.log(
           chalk.white(`   ├── Testing: ${analysis.testing.framework}`),
         );
+        console.log(
+          chalk.white(
+            `   ├── Archivos: ${analysis.metrics.totalFiles} (${analysis.metrics.totalLines} líneas)`,
+          ),
+        );
+        console.log(
+          chalk.white(`   ├── TypeScript: ${analysis.metrics.tsPercentage}%`),
+        );
+
+        if (analysis.endpoints.length > 0) {
+          console.log(
+            chalk.white(
+              `   ├── Endpoints: ${analysis.endpoints.length} detectados`,
+            ),
+          );
+        }
+        if (analysis.envVars.length > 0) {
+          console.log(
+            chalk.white(
+              `   ├── Env vars: ${analysis.envVars.length} variables`,
+            ),
+          );
+        }
 
         if (analysis.stateManagement.length > 0) {
           console.log(

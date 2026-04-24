@@ -13,6 +13,10 @@ import {
 } from "./framework";
 import { detectPatterns } from "./patterns";
 import { detectConfigs } from "./config";
+import { detectEndpoints } from "./endpoints";
+import { buildImportGraph, detectEntryPoints } from "./imports";
+import { detectEnvVars } from "./envvars";
+import { analyzeMetrics } from "./metrics";
 
 export function analyzeProject(projectPath: string): ProjectAnalysis {
   const resolvedPath = path.resolve(projectPath);
@@ -41,6 +45,13 @@ export function analyzeProject(projectPath: string): ProjectAnalysis {
   const database = detectDatabase(dependencies);
   const authentication = detectAuthentication(dependencies);
 
+  // 7. Source code analysis
+  const endpoints = detectEndpoints(resolvedPath, dependencies);
+  const importGraph = buildImportGraph(resolvedPath);
+  const envVars = detectEnvVars(resolvedPath);
+  const metrics = analyzeMetrics(resolvedPath);
+  const entryPoints = detectEntryPoints(resolvedPath, importGraph, scripts);
+
   return {
     projectName,
     projectPath: resolvedPath,
@@ -56,5 +67,10 @@ export function analyzeProject(projectPath: string): ProjectAnalysis {
     testing,
     database,
     authentication,
+    endpoints,
+    envVars,
+    importGraph,
+    metrics,
+    entryPoints,
   };
 }

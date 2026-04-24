@@ -1,4 +1,4 @@
-# 🚀 project-onboarder
+# 🚀 Dev-Onboarder
 
 CLI tool que analiza cualquier proyecto Node.js/TypeScript y genera automáticamente una **guía de onboarding** completa para nuevos desarrolladores.
 
@@ -25,14 +25,14 @@ Escanea tu proyecto y genera un documento `ONBOARDING.md` que incluye:
 
 ```bash
 # Opción 1: Ejecutar directamente con npx (recomendado)
-npx project-onboarder
+npx dev-onboarder
 
 # Opción 2: Instalar globalmente
-npm install -g project-onboarder
+npm install -g dev-onboarder
 
 # Opción 3: Clonar el repo
 git clone <url>
-cd project-onboarder
+cd dev-onboarder
 npm install
 npm run build
 ```
@@ -41,19 +41,19 @@ npm run build
 
 ```bash
 # Analizar el directorio actual
-npx project-onboarder
+npx dev-onboarder
 
 # Analizar un proyecto específico
-npx project-onboarder /ruta/al/proyecto
+npx dev-onboarder /ruta/al/proyecto
 
 # Cambiar nombre del archivo de salida
-npx project-onboarder --output GUIA.md
+npx dev-onboarder --output GUIA.md
 
 # Imprimir en consola en lugar de archivo
-npx project-onboarder --stdout
+npx dev-onboarder --stdout
 
 # Exportar análisis como JSON
-npx project-onboarder --json
+npx dev-onboarder --json
 ```
 
 ## Ejemplo de salida
@@ -61,7 +61,7 @@ npx project-onboarder --json
 Al ejecutar en un proyecto Next.js con Prisma y Tailwind, genera algo como:
 
 ```
-🔍 project-onboarder
+🔍 dev-onboarder
 
    Analizando: /Users/dev/mi-proyecto
 
