@@ -1,5 +1,24 @@
 import { ProjectAnalysis } from "../types";
 
+/**
+ * Wraps raw Mermaid code into both a ```mermaid block (for GitHub/GitLab)
+ * and a mermaid.ink image fallback (for any other Markdown viewer).
+ */
+function wrapDiagram(mermaidCode: string, alt: string): string {
+  const encoded = Buffer.from(mermaidCode, "utf-8").toString("base64url");
+  const imgUrl = `https://mermaid.ink/img/${encoded}`;
+
+  let output = "";
+  // Mermaid code block (renders on GitHub, GitLab, VS Code)
+  output += "```mermaid\n" + mermaidCode + "\n```\n\n";
+  // Image fallback (renders everywhere else)
+  output += `<details><summary>📷 Ver como imagen</summary>\n\n`;
+  output += `![${alt}](${imgUrl})\n\n`;
+  output += `</details>`;
+
+  return output;
+}
+
 export function generateArchitectureDiagram(analysis: ProjectAnalysis): string {
   const {
     framework,
@@ -14,97 +33,96 @@ export function generateArchitectureDiagram(analysis: ProjectAnalysis): string {
     return "";
   }
 
-  let diagram = "```mermaid\nflowchart TB\n";
+  let code = "flowchart TB\n";
 
   // Client layer
   if (["frontend", "fullstack"].includes(framework.category)) {
-    diagram += '  subgraph CLIENT["🖥️ Cliente"]\n';
-    diagram += '    UI["UI Components"]\n';
+    code += '  subgraph CLIENT["🖥️ Cliente"]\n';
+    code += '    UI["UI Components"]\n';
 
     if (stateManagement.length > 0) {
-      diagram += `    STATE["Estado Global\\n(${stateManagement.map((s) => s.name).join(", ")})"]\n`;
-      diagram += "    UI --> STATE\n";
+      code += `    STATE["Estado Global\\n(${stateManagement.map((s) => s.name).join(", ")})"]\n`;
+      code += "    UI --> STATE\n";
     }
 
     if (styling.libraries.length > 0) {
-      diagram += `    STYLES["Estilos\\n(${styling.approach})"]\n`;
-      diagram += "    UI --> STYLES\n";
+      code += `    STYLES["Estilos\\n(${styling.approach})"]\n`;
+      code += "    UI --> STYLES\n";
     }
 
-    diagram += "  end\n\n";
+    code += "  end\n\n";
   }
 
   // API / Data layer
   if (dataFetching.length > 0 || framework.category === "fullstack") {
-    diagram += '  subgraph DATA["📡 Data Layer"]\n';
+    code += '  subgraph DATA["📡 Data Layer"]\n';
 
     if (dataFetching.length > 0) {
-      diagram += `    FETCH["Data Fetching\\n(${dataFetching.map((f) => f.name).join(", ")})"]\n`;
+      code += `    FETCH["Data Fetching\\n(${dataFetching.map((f) => f.name).join(", ")})"]\n`;
     }
 
     if (
       framework.category === "fullstack" ||
       framework.category === "backend"
     ) {
-      diagram += '    API["API Routes / Endpoints"]\n';
+      code += '    API["API Routes / Endpoints"]\n';
     }
 
-    diagram += "  end\n\n";
+    code += "  end\n\n";
   }
 
   // Backend / Server
   if (["backend", "fullstack"].includes(framework.category)) {
-    diagram += `  subgraph SERVER["⚙️ Server (${framework.name})"]\n`;
+    code += `  subgraph SERVER["⚙️ Server (${framework.name})"]\n`;
 
     if (authentication.length > 0) {
-      diagram += `    AUTH["Auth\\n(${authentication.map((a) => a.name).join(", ")})"]\n`;
+      code += `    AUTH["Auth\\n(${authentication.map((a) => a.name).join(", ")})"]\n`;
     }
 
-    diagram += '    LOGIC["Business Logic"]\n';
+    code += '    LOGIC["Business Logic"]\n';
 
     if (database.length > 0) {
-      diagram += `    ORM["ORM / DB Client\\n(${database.map((d) => d.name).join(", ")})"]\n`;
-      diagram += "    LOGIC --> ORM\n";
+      code += `    ORM["ORM / DB Client\\n(${database.map((d) => d.name).join(", ")})"]\n`;
+      code += "    LOGIC --> ORM\n";
     }
 
-    diagram += "  end\n\n";
+    code += "  end\n\n";
   }
 
   // Database
   if (database.length > 0) {
-    diagram += '  subgraph DB["🗄️ Base de Datos"]\n';
-    diagram += '    DATABASE[("Database")]\n';
-    diagram += "  end\n\n";
+    code += '  subgraph DB["🗄️ Base de Datos"]\n';
+    code += '    DATABASE[("Database")]\n';
+    code += "  end\n\n";
   }
 
   // Connections
   if (["frontend", "fullstack"].includes(framework.category)) {
     if (dataFetching.length > 0) {
-      diagram += "  UI --> FETCH\n";
+      code += "  UI --> FETCH\n";
     }
     if (framework.category === "fullstack") {
       if (dataFetching.length > 0) {
-        diagram += "  FETCH --> API\n";
+        code += "  FETCH --> API\n";
       } else {
-        diagram += "  UI --> API\n";
+        code += "  UI --> API\n";
       }
     }
   }
 
   if (["backend", "fullstack"].includes(framework.category)) {
     if (framework.category === "fullstack") {
-      diagram += "  API --> LOGIC\n";
+      code += "  API --> LOGIC\n";
     }
     if (authentication.length > 0) {
-      diagram += "  API --> AUTH\n";
+      code += "  API --> AUTH\n";
     }
     if (database.length > 0) {
-      diagram += "  ORM --> DATABASE\n";
+      code += "  ORM --> DATABASE\n";
     }
   }
 
-  diagram += "```";
-  return diagram;
+  return wrapDiagram(code, "Architecture Diagram");
 }
 
 export function generateDataFlowDiagram(analysis: ProjectAnalysis): string {
@@ -112,47 +130,47 @@ export function generateDataFlowDiagram(analysis: ProjectAnalysis): string {
 
   if (framework.category === "unknown") return "";
 
-  let diagram = "```mermaid\nsequenceDiagram\n";
+  let code = "sequenceDiagram\n";
 
   if (["frontend", "fullstack"].includes(framework.category)) {
-    diagram += "  participant U as 👤 Usuario\n";
-    diagram += "  participant C as 🖥️ Componente\n";
+    code += "  participant U as 👤 Usuario\n";
+    code += "  participant C as 🖥️ Componente\n";
 
     if (stateManagement.length > 0) {
-      diagram += `  participant S as 📦 Store (${stateManagement[0].name})\n`;
+      code += `  participant S as 📦 Store (${stateManagement[0].name})\n`;
     }
   }
 
   if (dataFetching.length > 0) {
-    diagram += `  participant F as 📡 ${dataFetching[0].name}\n`;
+    code += `  participant F as 📡 ${dataFetching[0].name}\n`;
   }
 
   if (["backend", "fullstack"].includes(framework.category)) {
-    diagram += `  participant API as ⚙️ ${framework.name} API\n`;
+    code += `  participant API as ⚙️ ${framework.name} API\n`;
   }
 
   if (database.length > 0) {
-    diagram += "  participant DB as 🗄️ Database\n";
+    code += "  participant DB as 🗄️ Database\n";
   }
 
-  diagram += "\n";
+  code += "\n";
 
   // Flow
   if (["frontend", "fullstack"].includes(framework.category)) {
-    diagram += "  U->>C: Interacción\n";
+    code += "  U->>C: Interacción\n";
 
     if (stateManagement.length > 0) {
-      diagram += "  C->>S: Actualizar estado\n";
-      diagram += "  S-->>C: Re-render\n";
+      code += "  C->>S: Actualizar estado\n";
+      code += "  S-->>C: Re-render\n";
     }
 
     if (dataFetching.length > 0) {
-      diagram += "  C->>F: Request datos\n";
+      code += "  C->>F: Request datos\n";
       if (["backend", "fullstack"].includes(framework.category)) {
-        diagram += "  F->>API: HTTP/GraphQL Request\n";
+        code += "  F->>API: HTTP/GraphQL Request\n";
       }
     } else if (["backend", "fullstack"].includes(framework.category)) {
-      diagram += "  C->>API: HTTP Request\n";
+      code += "  C->>API: HTTP Request\n";
     }
   }
 
@@ -160,25 +178,24 @@ export function generateDataFlowDiagram(analysis: ProjectAnalysis): string {
     ["backend", "fullstack"].includes(framework.category) &&
     database.length > 0
   ) {
-    diagram += "  API->>DB: Query\n";
-    diagram += "  DB-->>API: Resultado\n";
+    code += "  API->>DB: Query\n";
+    code += "  DB-->>API: Resultado\n";
   }
 
   if (["backend", "fullstack"].includes(framework.category)) {
     if (dataFetching.length > 0) {
-      diagram += "  API-->>F: Response\n";
-      diagram += "  F-->>C: Datos (cached)\n";
+      code += "  API-->>F: Response\n";
+      code += "  F-->>C: Datos (cached)\n";
     } else if (["frontend", "fullstack"].includes(framework.category)) {
-      diagram += "  API-->>C: Response\n";
+      code += "  API-->>C: Response\n";
     }
   }
 
   if (["frontend", "fullstack"].includes(framework.category)) {
-    diagram += "  C-->>U: UI Actualizada\n";
+    code += "  C-->>U: UI Actualizada\n";
   }
 
-  diagram += "```";
-  return diagram;
+  return wrapDiagram(code, "Data Flow Diagram");
 }
 
 export function generateFolderDiagram(analysis: ProjectAnalysis): string {
@@ -187,25 +204,24 @@ export function generateFolderDiagram(analysis: ProjectAnalysis): string {
 
   if (dirs.length === 0) return "";
 
-  let diagram = "```mermaid\nflowchart LR\n";
-  diagram += `  ROOT["📁 ${analysis.projectName}"]\n`;
+  let code = "flowchart LR\n";
+  code += `  ROOT["📁 ${analysis.projectName}"]\n`;
 
   for (const dir of dirs.slice(0, 12)) {
     const id = dir.name.replace(/[^a-zA-Z0-9]/g, "_");
     const icon = getDirIcon(dir.name);
-    diagram += `  ROOT --> ${id}["${icon} ${dir.name}/"]\n`;
+    code += `  ROOT --> ${id}["${icon} ${dir.name}/"]\n`;
 
     // Show one level of subdirs
     const subDirs =
       dir.children?.filter((c) => c.type === "directory").slice(0, 5) || [];
     for (const sub of subDirs) {
       const subId = `${id}_${sub.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
-      diagram += `  ${id} --> ${subId}["${sub.name}/"]\n`;
+      code += `  ${id} --> ${subId}["${sub.name}/"]\n`;
     }
   }
 
-  diagram += "```";
-  return diagram;
+  return wrapDiagram(code, "Folder Structure");
 }
 
 function getDirIcon(name: string): string {
@@ -251,16 +267,16 @@ export function generateImportGraphDiagram(analysis: ProjectAnalysis): string {
 
   const nodeFiles = new Set(nodes.map((n) => n.file));
 
-  let diagram = "```mermaid\nflowchart LR\n";
+  let code = "flowchart LR\n";
 
   // Add nodes
   for (const node of nodes) {
     const id = sanitizeId(node.file);
     const label = shortenPath(node.file);
-    diagram += `  ${id}["${label}"]\n`;
+    code += `  ${id}["${label}"]\n`;
   }
 
-  diagram += "\n";
+  code += "\n";
 
   // Add edges (only between visible nodes)
   const edges = new Set<string>();
@@ -272,14 +288,13 @@ export function generateImportGraphDiagram(analysis: ProjectAnalysis): string {
         const edgeKey = `${fromId}->${toId}`;
         if (!edges.has(edgeKey)) {
           edges.add(edgeKey);
-          diagram += `  ${fromId} --> ${toId}\n`;
+          code += `  ${fromId} --> ${toId}\n`;
         }
       }
     }
   }
 
-  diagram += "```";
-  return diagram;
+  return wrapDiagram(code, "Import Graph");
 }
 
 function sanitizeId(filePath: string): string {
