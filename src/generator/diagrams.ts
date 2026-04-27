@@ -1,20 +1,19 @@
 import { ProjectAnalysis } from "../types";
+import { deflateSync } from "zlib";
 
 /**
- * Wraps raw Mermaid code into both a ```mermaid block (for GitHub/GitLab)
- * and a mermaid.ink image fallback (for any other Markdown viewer).
+ * Wraps raw Mermaid code into a ```mermaid block (for GitHub/GitLab/VS Code)
+ * plus a link to Mermaid Live Editor as universal fallback.
  */
 function wrapDiagram(mermaidCode: string, alt: string): string {
-  const encoded = Buffer.from(mermaidCode, "utf-8").toString("base64url");
-  const imgUrl = `https://mermaid.ink/img/${encoded}`;
+  const state = JSON.stringify({ code: mermaidCode });
+  const compressed = deflateSync(state, { level: 9 });
+  const encoded = Buffer.from(compressed).toString("base64url");
+  const liveUrl = `https://mermaid.live/edit#pako:${encoded}`;
 
   let output = "";
-  // Mermaid code block (renders on GitHub, GitLab, VS Code)
   output += "```mermaid\n" + mermaidCode + "\n```\n\n";
-  // Image fallback (renders everywhere else)
-  output += `<details><summary>📷 Ver como imagen</summary>\n\n`;
-  output += `![${alt}](${imgUrl})\n\n`;
-  output += `</details>`;
+  output += `> 📎 [Ver "${alt}" en Mermaid Live Editor](${liveUrl})\n`;
 
   return output;
 }

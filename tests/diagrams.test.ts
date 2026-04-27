@@ -45,72 +45,64 @@ export function getUsers(req: any, res: any) {
   return fixture;
 }
 
-describe("diagram image fallback", () => {
-  it("architecture diagram contains mermaid block and mermaid.ink image", () => {
+describe("diagram with Mermaid Live fallback", () => {
+  it("architecture diagram contains mermaid block and live editor link", () => {
     const fixture = makeExpressFixture();
     const analysis = analyzeProject(fixture.path);
     const diagram = generateArchitectureDiagram(analysis);
 
-    // Must have mermaid code block
     expect(diagram).toContain("```mermaid");
     expect(diagram).toContain("flowchart TB");
     expect(diagram).toContain("```\n");
-
-    // Must have image fallback
-    expect(diagram).toContain("<details>");
-    expect(diagram).toContain("mermaid.ink/img/");
-    expect(diagram).toContain("![Architecture Diagram]");
-    expect(diagram).toContain("</details>");
+    expect(diagram).toContain("mermaid.live/edit#pako:");
+    expect(diagram).toContain('"Architecture Diagram"');
   });
 
-  it("data flow diagram contains mermaid block and mermaid.ink image", () => {
+  it("data flow diagram contains mermaid block and live editor link", () => {
     const fixture = makeExpressFixture();
     const analysis = analyzeProject(fixture.path);
     const diagram = generateDataFlowDiagram(analysis);
 
     expect(diagram).toContain("```mermaid");
     expect(diagram).toContain("sequenceDiagram");
-    expect(diagram).toContain("<details>");
-    expect(diagram).toContain("mermaid.ink/img/");
-    expect(diagram).toContain("![Data Flow Diagram]");
+    expect(diagram).toContain("mermaid.live/edit#pako:");
+    expect(diagram).toContain('"Data Flow Diagram"');
   });
 
-  it("folder diagram contains mermaid block and mermaid.ink image", () => {
+  it("folder diagram contains mermaid block and live editor link", () => {
     const fixture = makeExpressFixture();
     const analysis = analyzeProject(fixture.path);
     const diagram = generateFolderDiagram(analysis);
 
     expect(diagram).toContain("```mermaid");
     expect(diagram).toContain("flowchart LR");
-    expect(diagram).toContain("<details>");
-    expect(diagram).toContain("mermaid.ink/img/");
-    expect(diagram).toContain("![Folder Structure]");
+    expect(diagram).toContain("mermaid.live/edit#pako:");
+    expect(diagram).toContain('"Folder Structure"');
   });
 
-  it("import graph diagram contains mermaid block and mermaid.ink image", () => {
+  it("import graph diagram contains mermaid block and live editor link", () => {
     const fixture = makeExpressFixture();
     const analysis = analyzeProject(fixture.path);
     const diagram = generateImportGraphDiagram(analysis);
 
     expect(diagram).toContain("```mermaid");
     expect(diagram).toContain("flowchart LR");
-    expect(diagram).toContain("<details>");
-    expect(diagram).toContain("mermaid.ink/img/");
-    expect(diagram).toContain("![Import Graph]");
+    expect(diagram).toContain("mermaid.live/edit#pako:");
+    expect(diagram).toContain('"Import Graph"');
   });
 
-  it("mermaid.ink URL contains valid base64url encoding", () => {
+  it("pako-encoded URL decodes to valid mermaid code", () => {
+    const { inflateSync } = require("zlib");
     const fixture = makeExpressFixture();
     const analysis = analyzeProject(fixture.path);
     const diagram = generateArchitectureDiagram(analysis);
 
-    // Extract the base64url portion from the URL
-    const match = diagram.match(/mermaid\.ink\/img\/([A-Za-z0-9_-]+)/);
+    const match = diagram.match(/pako:([A-Za-z0-9_-]+)/);
     expect(match).not.toBeNull();
 
-    // Decode and verify it's valid mermaid code
-    const decoded = Buffer.from(match![1], "base64url").toString("utf-8");
-    expect(decoded).toContain("flowchart TB");
+    const decompressed = inflateSync(Buffer.from(match![1], "base64url"));
+    const state = JSON.parse(decompressed.toString("utf-8"));
+    expect(state.code).toContain("flowchart TB");
   });
 
   it("returns empty string for unknown framework", () => {
